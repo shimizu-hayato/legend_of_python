@@ -6,7 +6,7 @@ legend_of_python
 ## Description
 pygameで作成した2Dアクションゲーム
 
-## Install
+## Play
 ```
 $ cd legend_of_python
 $ pipenv --python 3
