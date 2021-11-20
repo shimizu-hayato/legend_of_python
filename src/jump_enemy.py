@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-#coding: utf-8
+# coding: utf-8
 
 import pygame
 from pygame.locals import *
@@ -16,10 +16,11 @@ SCR_RECT = Rect(0, 0, 640, 480)
 
 class JumpEnemy(pygame.sprite.Sprite):
     """敵"""
-    LEFT,INIT,RIGHT = (-1,0, 1) # 移動方向
-    MOVE_SPEED = 2.0            # 移動速度
-    JUMP_SPEED = 6.0            # ジャンプの初速度
-    GRAVITY = 0.2               # 重力加速度
+
+    LEFT, INIT, RIGHT = (-1, 0, 1)  # 移動方向
+    MOVE_SPEED = 2.0  # 移動速度
+    JUMP_SPEED = 6.0  # ジャンプの初速度
+    GRAVITY = 0.2  # 重力加速度
 
     def __init__(self, pos, blocks):
         pygame.sprite.Sprite.__init__(self, Enemy.containers)
@@ -40,13 +41,13 @@ class JumpEnemy(pygame.sprite.Sprite):
         self.time = 0
         self.f_newrect = 0
 
-        #地面にいるか
+        # 地面にいるか
         self.on_floor = False
         self.mode = 0
 
     def update(self):
         if self.mode == 0:
-            self.fpvy = - self.JUMP_SPEED  # 上向きに初速度を与える
+            self.fpvy = -self.JUMP_SPEED  # 上向きに初速度を与える
             self.on_floor = False
             self.mode = 1
 
@@ -91,15 +92,15 @@ class JumpEnemy(pygame.sprite.Sprite):
         for block in self.blocks:
             collide = newrect.colliderect(block.rect)
             if collide:  # 衝突するブロックあり
-                if self.fpvx > 0:    # 右に移動中に衝突
+                if self.fpvx > 0:  # 右に移動中に衝突
                     self.fpx = block.rect.left - width
                     self.fpvx = 0
-                    self.direct = self.LEFT #反転
+                    self.direct = self.LEFT  # 反転
 
                 elif self.fpvx < 0:  # 左に移動中に衝突
                     self.fpx = block.rect.right
                     self.fpvx = 0
-                    self.direct = self.RIGHT # 反転
+                    self.direct = self.RIGHT  # 反転
                 break  # 衝突ブロックは1個調べれば十分
             else:
                 # 衝突ブロックがない場合、位置を更新
@@ -108,21 +109,21 @@ class JumpEnemy(pygame.sprite.Sprite):
     def collision_y(self):
         """Y方向の衝突判定処理"""
         # パイソンのサイズ
-        width = self.rect.width - 1 
+        width = self.rect.width - 1
         height = self.rect.height
-        
+
         # Y方向の移動先の座標と矩形を求める
         newy = self.fpy + self.fpvy
         newrect = Rect(self.fpx, newy, width, height)
 
         if newy > 10000:
             self.kill()
-        
+
         # ブロックとの衝突判定
         for block in self.blocks:
             collide = newrect.colliderect(block.rect)
             if collide:  # 衝突するブロックあり
-                if self.fpvy > 0:    # 下に移動中に衝突
+                if self.fpvy > 0:  # 下に移動中に衝突
                     # めり込まないように調整して速度を0に
                     self.fpy = block.rect.top - height
                     self.fpvy = 0

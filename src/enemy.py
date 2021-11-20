@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-#coding: utf-8
+# coding: utf-8
 
 
 import pygame
@@ -10,16 +10,18 @@ import pdb
 
 from load_image import load_image
 
-START, PLAY, GAMEOVER = (0, 1, 2) 
+START, PLAY, GAMEOVER = (0, 1, 2)
 SCR_RECT = Rect(0, 0, 640, 480)
 
 
 class Enemy(pygame.sprite.Sprite):
     """敵"""
-    LEFT,STOP,RIGHT = (-1,0, 1) # 移動方向
-    MOVE_SPEED = 1.0     # 移動速度
-    JUMP_SPEED = 6.0     # ジャンプの初速度
-    GRAVITY = 0.2        # 重力加速度
+
+    LEFT, STOP, RIGHT = (-1, 0, 1)  # 移動方向
+    MOVE_SPEED = 1.0  # 移動速度
+    JUMP_SPEED = 6.0  # ジャンプの初速度
+    GRAVITY = 0.2  # 重力加速度
+
     def __init__(self, pos, blocks, python):
         pygame.sprite.Sprite.__init__(self, self.containers)
         self.left_image = load_image("enemy.png", -1)
@@ -39,7 +41,7 @@ class Enemy(pygame.sprite.Sprite):
 
         self.f_newrect = 0
 
-        #地面にいるか
+        # 地面にいるか
         self.on_floor = False
 
     def update(self):
@@ -61,7 +63,7 @@ class Enemy(pygame.sprite.Sprite):
         self.collision_x()  # X方向の衝突判定処理
         self.collision_y()  # Y方向の衝突判定処理
         if self.front_collision_y():
-            if self.mode ==  self.LEFT:
+            if self.mode == self.LEFT:
                 self.mode = self.RIGHT
             else:
                 self.mode = self.LEFT
@@ -70,8 +72,6 @@ class Enemy(pygame.sprite.Sprite):
         # スプライトを動かすにはself.rectの更新が必要！
         self.rect.x = int(self.fpx)
         self.rect.y = int(self.fpy)
-
-        
 
     def collision_x(self):
         """X方向の衝突判定処理"""
@@ -86,16 +86,16 @@ class Enemy(pygame.sprite.Sprite):
         for block in self.blocks:
             collide = newrect.colliderect(block.rect)
             if collide:  # 衝突するブロックあり
-                if self.fpvx > 0:    # 右に移動中に衝突
+                if self.fpvx > 0:  # 右に移動中に衝突
                     # めり込まないように調整して速度を0に
                     self.fpx = block.rect.left - width
                     self.fpvx = 0
-                    self.mode = self.LEFT #反転
+                    self.mode = self.LEFT  # 反転
 
                 elif self.fpvx < 0:  # 左に移動中に衝突
                     self.fpx = block.rect.right
                     self.fpvx = 0
-                    self.mode = self.RIGHT # 反転
+                    self.mode = self.RIGHT  # 反転
                 break  # 衝突ブロックは1個調べれば十分
             else:
                 # 衝突ブロックがない場合、位置を更新
@@ -104,18 +104,18 @@ class Enemy(pygame.sprite.Sprite):
     def collision_y(self):
         """Y方向の衝突判定処理"""
         # パイソンのサイズ
-        width = self.rect.width - 1 
+        width = self.rect.width - 1
         height = self.rect.height
-        
+
         # Y方向の移動先の座標と矩形を求める
         newy = self.fpy + self.fpvy
         newrect = Rect(self.fpx, newy, width, height)
-        
+
         # ブロックとの衝突判定
         for block in self.blocks:
             collide = newrect.colliderect(block.rect)
             if collide:  # 衝突するブロックあり
-                if self.fpvy > 0:    # 下に移動中に衝突
+                if self.fpvy > 0:  # 下に移動中に衝突
                     # めり込まないように調整して速度を0に
                     self.fpy = block.rect.top - height
                     self.fpvy = 0
@@ -139,31 +139,31 @@ class Enemy(pygame.sprite.Sprite):
         if self.on_floor and self.fpvy == 0:
             newy = self.fpy + self.fpvy
             newx = self.fpx + self.fpvx
-            width = self.rect.width -1
+            width = self.rect.width - 1
             height = self.rect.height
 
-            if self.mode ==  self.LEFT:
-                self.f_newrect = Rect(newx - width, newy+height, width, height)
+            if self.mode == self.LEFT:
+                self.f_newrect = Rect(newx - width, newy + height, width, height)
             else:
-                self.f_newrect = Rect(newx + width, newy+height, width, height)
+                self.f_newrect = Rect(newx + width, newy + height, width, height)
 
-            #pdb.set_trace()
+            # pdb.set_trace()
 
             for block in self.blocks:
                 f_collide = self.f_newrect.colliderect(block.rect)
                 if f_collide:
                     return False
-                    
+
             return True
         else:
             return False
 
     def offset_start(self):
-        offsetx,offsety = self.python.calc_offset()
-        screen_rect = Rect(offsetx,offsety,offsetx + SCR_RECT.width,offsety + SCR_RECT.height)
+        offsetx, offsety = self.python.calc_offset()
+        screen_rect = Rect(
+            offsetx, offsety, offsetx + SCR_RECT.width, offsety + SCR_RECT.height
+        )
         if screen_rect.colliderect(self.rect):
             return True
         else:
             return False
-
-

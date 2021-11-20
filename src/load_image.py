@@ -1,13 +1,15 @@
 #!/usr/bin/env python
-#coding: utf-8
+# coding: utf-8
+
+import os
 
 import pygame
 from pygame.locals import *
-import os
+
 
 def load_image(filename, colorkey=None):
     """画像をロードして画像と矩形を返す"""
-    filename = os.path.join("data", filename)
+    filename = os.path.join("./images", filename)
     try:
         image = pygame.image.load(filename)
     except pygame.error as message:
@@ -16,6 +18,6 @@ def load_image(filename, colorkey=None):
     image = image.convert()
     if colorkey is not None:
         if colorkey is -1:
-            colorkey = image.get_at((0,0))
+            colorkey = image.get_at((0, 0))
         image.set_colorkey(colorkey, RLEACCEL)
     return image
