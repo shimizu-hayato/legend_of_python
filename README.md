@@ -12,3 +12,7 @@ $ cd legend_of_python
 $ poetry install
 $ poetry run python src/game.py
 ```
+
+## Commands
+- spaceキー: ジャンプ
+- ←→キー: 左右に移動
