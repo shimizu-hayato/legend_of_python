@@ -2,11 +2,12 @@
 # coding: utf-8
 
 
+import os
+import pdb
+import sys
+
 import pygame
 from pygame.locals import *
-import os
-import sys
-import pdb
 
 from load_image import load_image
 
@@ -78,16 +79,13 @@ class Python(pygame.sprite.Sprite):
                 )
             else:
                 y = self.rect.y
-            # print(self.fpvy)
             self.rect.x = int(self.fpx)
             self.rect.y = int(y)
             if y > self.map_size[1] + 200:
-                # pdb.set_trace()
                 self.game_state = GAMEOVER
                 self.kill()
 
         elif self.start:
-            # if self.game_state == PLAY:
             self.time += 1
             if self.time > 30:
                 self.start = False
@@ -271,5 +269,4 @@ class Python(pygame.sprite.Sprite):
             offsety = 0
         elif offsety > self.map_size[1] - SCR_RECT.height:
             offsety = self.map_size[1] - SCR_RECT.height
-
         return offsetx, offsety
