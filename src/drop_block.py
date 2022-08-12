@@ -2,10 +2,10 @@
 # coding: utf-8
 
 
-import pygame
-from pygame.locals import *
 import pdb
 
+import pygame
+from pygame.locals import *
 
 from load_image import load_image
 
