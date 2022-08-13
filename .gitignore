@@ -146,4 +146,6 @@ sandbox/
 *~
 
 
+# large image file
 *.gif
+big_star.png

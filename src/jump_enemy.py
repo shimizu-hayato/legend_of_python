@@ -1,14 +1,14 @@
 #!/usr/bin/env python
 # coding: utf-8
 
-import pygame
-from pygame.locals import *
 import os
 import sys
-import pdb
 
-from load_image import load_image
+import pygame
+from pygame.locals import *
+
 from enemy import Enemy
+from load_image import load_image
 
 START, PLAY, GAMEOVER = (0, 1, 2)
 SCR_RECT = Rect(0, 0, 640, 480)

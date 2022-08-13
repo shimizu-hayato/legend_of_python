@@ -24,7 +24,7 @@ class ElectricEnemy(pygame.sprite.Sprite):
     JUMP_SPEED = 7.0  # ジャンプの初速度
     GRAVITY = 0.2  # 重力加速度
 
-    def __init__(self, pos, blocks, python):
+    def __init__(self, pos, blocks, player):
         pygame.sprite.Sprite.__init__(self, Enemy.containers)
         self.left_image = load_image("electric_enemy.png", -1)
         self.right_image = pygame.transform.flip(self.left_image, 1, 0)
@@ -35,7 +35,7 @@ class ElectricEnemy(pygame.sprite.Sprite):
         self.rect.x, self.rect.y = pos[0], pos[1]  # 座標設定
 
         self.blocks = blocks
-        self.python = python
+        self.player = player
         self.direct = self.LEFT
         self.mode = 0
         self.fpx = float(self.rect.x)
@@ -51,7 +51,7 @@ class ElectricEnemy(pygame.sprite.Sprite):
         self.on_floor = False
 
     def update(self):
-        if self.rect.x < self.python.rect.x:
+        if self.rect.x < self.player.rect.x:
             self.image = self.right_image
             self.direct = self.RIGHT
         else:
@@ -68,7 +68,7 @@ class ElectricEnemy(pygame.sprite.Sprite):
 
             elif self.mode == 2:
                 Electric(
-                    self.rect.topleft, self.python.rect.topleft, self.blocks, self.direct
+                    self.rect.topleft, self.player.rect.topleft, self.blocks, self.direct
                 )
                 self.mode = 3
             elif self.mode == 3:
@@ -152,12 +152,10 @@ class ElectricEnemy(pygame.sprite.Sprite):
 
     def _start(self):
         # playerが画面内に入ったか確認
-        offsetx, offsety = self.python.calc_offset()
+        offsetx, offsety = self.player.calc_offset()
         screen_rect = Rect(
             offsetx, offsety, offsetx + SCR_RECT.width, offsety + SCR_RECT.height
         )
-        print(self.rect)
-        print(screen_rect)
         if screen_rect.colliderect(self.rect):
             return True
         else:
@@ -178,7 +176,7 @@ class Electric(pygame.sprite.Sprite):
         self.image = self.left_yellow_image
         self.rect = self.image.get_rect()
         self.rect.topleft = pos
-        self.python_pos = python_pos
+        self.player_pos = python_pos
         # self.rect.x, self.rect.y = pos[0], pos[1]  # 座標設定
         self.blocks = blocks
         self.direct = mode
@@ -202,8 +200,8 @@ class Electric(pygame.sprite.Sprite):
     def unit_vector(self):
         enemy_x = self.rect.x
         enemy_y = self.rect.y
-        python_x = self.python_pos[0]
-        python_y = self.python_pos[1]
+        python_x = self.player_pos[0]
+        python_y = self.player_pos[1]
         vec = (python_x - enemy_x, python_y - enemy_y)
         scala = math.sqrt(vec[0] ** 2 + vec[1] ** 2)
         return (vec[0] / scala, vec[1] / scala)

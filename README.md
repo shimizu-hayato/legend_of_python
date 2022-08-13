@@ -14,5 +14,5 @@ $ poetry run python src/game.py
 ```
 
 ## Commands
-- spaceキー: ジャンプ
+- spaceキー: ジャンプ（2段ジャンプ）
 - ←→キー: 左右に移動

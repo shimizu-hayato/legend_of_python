@@ -2,19 +2,18 @@
 # coding: utf-8
 
 import os
-import pdb
 import sys
 
 import pygame
 from pygame.locals import *
 
-from drop_block import DropBlock
 from electric_enemy import Electric, ElectricEnemy
 from enemy import Enemy
 from fire_enemy import Fire, FireEnemy
 from jump_enemy import JumpEnemy
 from load_image import load_image
-from python import Python
+from move_block import MoveBlock
+from player import Player
 
 START, PLAY, GAMEOVER = (0, 1, 2)
 SCR_RECT = Rect(0, 0, 640, 480)
@@ -38,14 +37,14 @@ class Map:
         self.enemys = pygame.sprite.Group()
         self.fires = pygame.sprite.Group()
         self.electrics = pygame.sprite.Group()
-        self.drop_blocks = pygame.sprite.Group()
+        # self.move_blocks = pygame.sprite.Group()
 
         Block.containers = self.all, self.blocks
         Thorn.containers = self.all, self.thorns
         Enemy.containers = self.all, self.enemys
         Fire.containers = self.all, self.fires
         Electric.containers = self.all, self.electrics
-        Python.containers = self.all, self.player
+        Player.containers = self.all, self.player
 
         self.load(filename)
 
@@ -65,15 +64,15 @@ class Map:
 
     def game_mode(self, game_state):
         # self.python_sp = Python.containers[1].sprites()[0]
-        if self.python.game_state == GAMEOVER:
-            self.game_state = self.python.game_state
+        if self.player.game_state == GAMEOVER:
+            self.game_state = self.player.game_state
 
         return self.game_state
 
     def calc_offset(self):
         """オフセットを計算"""
-        offsetx = self.python.rect.topleft[0] - SCR_RECT.width / 2
-        offsety = self.python.rect.topleft[1] - SCR_RECT.height / 2
+        offsetx = self.player.rect.topleft[0] - SCR_RECT.width / 2
+        offsety = self.player.rect.topleft[1] - SCR_RECT.height / 2
         return offsetx, offsety
 
     def load(self, filename):
@@ -107,7 +106,7 @@ class Map:
         for i in range(self.row):
             for j in range(self.col):
                 if map[i][j] == "P":
-                    self.python = Python(
+                    self.player = Player(
                         (j * self.GS, i * self.GS),
                         self.blocks,
                         self.thorns,
@@ -121,15 +120,15 @@ class Map:
         for i in range(self.row):
             for j in range(self.col):
                 if map[i][j] == "E":
-                    Enemy((j * self.GS, i * self.GS), self.blocks, self.python)
+                    Enemy((j * self.GS, i * self.GS), self.blocks, self.player)
                 if map[i][j] == "J":
                     JumpEnemy((j * self.GS, i * self.GS), self.blocks)
                 if map[i][j] == "F":
-                    FireEnemy((j * self.GS, i * self.GS), self.blocks, self.python)
+                    FireEnemy((j * self.GS, i * self.GS), self.blocks, self.player)
                 if map[i][j] == "Y":
-                    ElectricEnemy((j * self.GS, i * self.GS), self.blocks, self.python)
+                    ElectricEnemy((j * self.GS, i * self.GS), self.blocks, self.player)
                 if map[i][j] == "C":
-                    DropBlock((j * self.GS, i * self.GS), self.python, self.blocks)
+                    MoveBlock((j * self.GS, i * self.GS), self.player, self.blocks)
 
 
 class Block(pygame.sprite.Sprite):
@@ -167,6 +166,21 @@ class Thorn(pygame.sprite.Sprite):
         self.rect = self.image.get_rect()
         self.rect.topleft = pos
 
+
+class Goal(pygame.sprite.Sprite):
+    """ゴール"""
+
+    NORMAL, DROP = (0, 1)
+
+    def __init__(self, pos):
+        self.image = load_image("star.png", -1)
+        pygame.sprite.Sprite.__init__(self, self.containers)
+        self.rect = self.image.get_rect()
+        self.rect.topleft = pos
+        self.block_type = 0
+
+    def touch(self):
+        return True
 
 if __name__ == "__main__":
     pygame.init()

@@ -3,7 +3,6 @@
 
 
 import os
-import pdb
 import sys
 
 import pygame
@@ -15,7 +14,7 @@ START, PLAY, GAMEOVER = (0, 1, 2)
 SCR_RECT = Rect(0, 0, 640, 480)
 
 
-class Python(pygame.sprite.Sprite):
+class Player(pygame.sprite.Sprite):
     """プレイヤー"""
 
     MOVE_SPEED = 2.5  # 移動速度
@@ -25,7 +24,7 @@ class Python(pygame.sprite.Sprite):
 
     def __init__(self, pos, blocks, thorns, enemys, fires, electrics, map_size):
         pygame.sprite.Sprite.__init__(self, self.containers)
-        self.left_image = load_image("half.png", -1)
+        self.left_image = load_image("player.png", -1)
         self.right_image = pygame.transform.flip(self.left_image, 1, 0)
         self.image = self.right_image
         self.rect = self.image.get_rect()
@@ -112,20 +111,16 @@ class Python(pygame.sprite.Sprite):
             if pressed_keys[K_SPACE]:
                 if self.on_floor:
                     self.fpvy = -self.JUMP_SPEED  # 上向きに初速度を与える
-                    # self.on_floor = False
                     self.jump_count = 1
                 elif not self.prev_button and self.jump_count < self.MAX_JUMP_COUNT:
                     self.fpvy = -self.JUMP_SPEED
                     self.jump_count += 1
 
             # 速度を更新
-            # if not self.on_floor:
             self.fpvy += self.GRAVITY  # 下向きに重力をかける
 
             self.collision_x()  # X方向の衝突判定処理
             self.collision_y()  # Y方向の衝突判定処理
-
-            # print(self.on_floor)
 
             self.collision_thorn()
             self.collision_enemy()
@@ -137,7 +132,7 @@ class Python(pygame.sprite.Sprite):
             self.rect.x = self.fpx
             self.rect.y = self.fpy
 
-            self.python_on_floor()
+            self.player_on_floor()
 
             # ボタンのジャンプキーの状態を記録
             self.prev_button = pressed_keys[K_SPACE]
@@ -202,17 +197,17 @@ class Python(pygame.sprite.Sprite):
 
     def collision_thorn(self):
         if pygame.sprite.spritecollideany(self, self.thorns):
-            self.python_die()
+            self.player_die()
 
     def collision_enemy(self):
         if pygame.sprite.spritecollideany(self, self.enemys):
-            self.python_die()
+            self.player_die()
 
         if pygame.sprite.spritecollideany(self, self.fires):
-            self.python_die()
+            self.player_die()
 
         if pygame.sprite.spritecollideany(self, self.electrics):
-            self.python_die()
+            self.player_die()
 
     def collision_fall(self):
         # Y方向の移動先の座標と矩形を求める
@@ -224,7 +219,7 @@ class Python(pygame.sprite.Sprite):
                 self.game_state = GAMEOVER
                 self.kill()
 
-    def python_on_floor(self):
+    def player_on_floor(self):
         w = self.rect.width
         h = self.rect.height
 
@@ -248,9 +243,9 @@ class Python(pygame.sprite.Sprite):
         for block in self.blocks:
             collide = uprect.colliderect(block.rect)
             if collide:
-                self.python_die()
+                self.player_die()
 
-    def python_die(self):
+    def player_die(self):
         self.damage = True
         if not self.damage_point:
             self.damage_point = self.rect.y
