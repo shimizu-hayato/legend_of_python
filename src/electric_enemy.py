@@ -1,15 +1,16 @@
 #!/usr/bin/env python
 # coding: utf-8
 
+import math
+import os
+import pdb
+import sys
+
 import pygame
 from pygame.locals import *
-import os
-import sys
-import pdb
-import math
 
-from load_image import load_image
 from enemy import Enemy
+from load_image import load_image
 
 START, PLAY, GAMEOVER = (0, 1, 2)
 SCR_RECT = Rect(0, 0, 640, 480)
@@ -20,26 +21,21 @@ class ElectricEnemy(pygame.sprite.Sprite):
 
     LEFT, INIT, RIGHT = (-1, 0, 1)  # 移動方向
     MOVE_SPEED = 1.0  # 移動速度
-    JUMP_SPEED = 6.0  # ジャンプの初速度
+    JUMP_SPEED = 7.0  # ジャンプの初速度
     GRAVITY = 0.2  # 重力加速度
 
-    def __init__(self, pos, blocks, python):
+    def __init__(self, pos, blocks, player):
         pygame.sprite.Sprite.__init__(self, Enemy.containers)
         self.left_image = load_image("electric_enemy.png", -1)
         self.right_image = pygame.transform.flip(self.left_image, 1, 0)
 
-        # self.fire_left_image = load_image("fire.png", -1)
-        # self.fire_right_image = pygame.transform.flip(self.fire_left_image, 1, 0)
-
         self.image = self.left_image
-        # self.fire_image = self.fire_left_image
-
         self.rect = self.image.get_rect()
         self.rect.topleft = pos
         self.rect.x, self.rect.y = pos[0], pos[1]  # 座標設定
 
         self.blocks = blocks
-        self.python = python
+        self.player = player
         self.direct = self.LEFT
         self.mode = 0
         self.fpx = float(self.rect.x)
@@ -55,34 +51,33 @@ class ElectricEnemy(pygame.sprite.Sprite):
         self.on_floor = False
 
     def update(self):
-        if self.rect.x < self.python.rect.x:
+        if self.rect.x < self.player.rect.x:
             self.image = self.right_image
             self.direct = self.RIGHT
         else:
             self.image = self.left_image
             self.direct = self.LEFT
+        if self._start():
+            if self.mode == 0:
+                self.fpvy = -self.JUMP_SPEED  # 上向きに初速度を与える
+                self.on_floor = False
+                self.mode = 1
 
-        if self.mode == 0:
-            self.fpvy = -self.JUMP_SPEED  # 上向きに初速度を与える
-            self.on_floor = False
-            self.mode = 1
-
-        elif self.mode == 1:
-            if self.fpvy > 0:
+            elif self.mode == 1 and self.fpvy > 0:
                 self.mode = 2
 
-        elif self.mode == 2:
-            Electric(
-                self.rect.topleft, self.python.rect.topleft, self.blocks, self.direct
-            )
-            self.mode = 3
-        elif self.mode == 3:
-            self.time += 1
-            if self.time % 120 == 0:
-                self.mode = 0
-                self.time = 0
+            elif self.mode == 2:
+                Electric(
+                    self.rect.topleft, self.player.rect.topleft, self.blocks, self.direct
+                )
+                self.mode = 3
+            elif self.mode == 3:
+                self.time += 1
+                if self.time % 120 == 0:
+                    self.mode = 0
+                    self.time = 0
 
-        self.fpvy += self.GRAVITY
+            self.fpvy += self.GRAVITY
 
         self.collision_x()  # X方向の衝突判定処理
         self.collision_y()  # Y方向の衝突判定処理
@@ -121,6 +116,7 @@ class ElectricEnemy(pygame.sprite.Sprite):
                 self.fpx = newx
 
     def collision_y(self):
+
         """Y方向の衝突判定処理"""
         # パイソンのサイズ
         width = self.rect.width
@@ -154,6 +150,16 @@ class ElectricEnemy(pygame.sprite.Sprite):
             # 衝突ブロックがないなら床の上にいない
             self.on_floor = False
 
+    def _start(self):
+        # playerが画面内に入ったか確認
+        offsetx, offsety = self.player.calc_offset()
+        screen_rect = Rect(
+            offsetx, offsety, offsetx + SCR_RECT.width, offsety + SCR_RECT.height
+        )
+        if screen_rect.colliderect(self.rect):
+            return True
+        else:
+            return False
 
 class Electric(pygame.sprite.Sprite):
     speed = 6  # 移動速度
@@ -170,7 +176,7 @@ class Electric(pygame.sprite.Sprite):
         self.image = self.left_yellow_image
         self.rect = self.image.get_rect()
         self.rect.topleft = pos
-        self.python_pos = python_pos
+        self.player_pos = python_pos
         # self.rect.x, self.rect.y = pos[0], pos[1]  # 座標設定
         self.blocks = blocks
         self.direct = mode
@@ -194,8 +200,8 @@ class Electric(pygame.sprite.Sprite):
     def unit_vector(self):
         enemy_x = self.rect.x
         enemy_y = self.rect.y
-        python_x = self.python_pos[0]
-        python_y = self.python_pos[1]
+        python_x = self.player_pos[0]
+        python_y = self.player_pos[1]
         vec = (python_x - enemy_x, python_y - enemy_y)
         scala = math.sqrt(vec[0] ** 2 + vec[1] ** 2)
         return (vec[0] / scala, vec[1] / scala)

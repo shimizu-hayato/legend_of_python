@@ -1,14 +1,14 @@
 #!/usr/bin/env python
 # coding: utf-8
 
-import pygame
-from pygame.locals import *
 import os
 import sys
-import pdb
 
-from load_image import load_image
+import pygame
+from pygame.locals import *
+
 from enemy import Enemy
+from load_image import load_image
 
 START, PLAY, GAMEOVER = (0, 1, 2)
 SCR_RECT = Rect(0, 0, 640, 480)
@@ -22,23 +22,18 @@ class FireEnemy(pygame.sprite.Sprite):
     JUMP_SPEED = 6.0  # ジャンプの初速度
     GRAVITY = 0.2  # 重力加速度
 
-    def __init__(self, pos, blocks, python):
+    def __init__(self, pos, blocks, player):
         pygame.sprite.Sprite.__init__(self, Enemy.containers)
         self.left_image = load_image("fire_enemy.png", -1)
         self.right_image = pygame.transform.flip(self.left_image, 1, 0)
-
-        # self.fire_left_image = load_image("fire.png", -1)
-        # self.fire_right_image = pygame.transform.flip(self.fire_left_image, 1, 0)
-
         self.image = self.left_image
-        # self.fire_image = self.fire_left_image
 
         self.rect = self.image.get_rect()
         self.rect.topleft = pos
         self.rect.x, self.rect.y = pos[0], pos[1]  # 座標設定
 
         self.blocks = blocks
-        self.python = python
+        self.player = player
         self.mode = self.LEFT
         self.fpx = float(self.rect.x)
         self.fpy = float(self.rect.y)
@@ -54,7 +49,7 @@ class FireEnemy(pygame.sprite.Sprite):
 
     def update(self):
         if self.offset_start():
-            if self.rect.x < self.python.rect.x:
+            if self.rect.x < self.player.rect.x:
                 self.image = self.right_image
                 self.mode = self.RIGHT
             else:
@@ -140,7 +135,8 @@ class FireEnemy(pygame.sprite.Sprite):
             self.kill()
 
     def offset_start(self):
-        offsetx, offsety = self.python.calc_offset()
+        # playerが画面内に入ったか確認
+        offsetx, offsety = self.player.calc_offset()
         screen_rect = Rect(
             offsetx, offsety, offsetx + SCR_RECT.width, offsety + SCR_RECT.height
         )
@@ -148,7 +144,7 @@ class FireEnemy(pygame.sprite.Sprite):
             return True
         else:
             return False
-
+        
 
 class Fire(pygame.sprite.Sprite):
     speed = 4  # 移動速度

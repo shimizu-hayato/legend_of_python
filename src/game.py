@@ -2,7 +2,6 @@
 # coding: utf-8
 
 import os
-import pdb
 import sys
 
 import pygame
@@ -42,7 +41,7 @@ class PyAction:
 
         # マップのロード
         dirname = os.path.dirname(__file__)
-        filename = "../map_data/stage.map"
+        filename = "../map_data/test.map"
         if not dirname:
             self.map = Map(filename)
         else:
@@ -71,7 +70,7 @@ class PyAction:
             )
         elif self.game_state == PLAY:
             self.map.draw(screen)
-            # オフセッとに基づいてマップの一部を画面に描画
+            # オフセットに基づいてマップの一部を画面に描画
             offsetx, offsety = self.map.calc_offset()
 
             # 端ではスクロールしない

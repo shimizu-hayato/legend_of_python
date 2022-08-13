@@ -2,11 +2,11 @@
 # coding: utf-8
 
 
-import pygame
-from pygame.locals import *
 import os
 import sys
-import pdb
+
+import pygame
+from pygame.locals import *
 
 from load_image import load_image
 
@@ -22,7 +22,7 @@ class Enemy(pygame.sprite.Sprite):
     JUMP_SPEED = 6.0  # ジャンプの初速度
     GRAVITY = 0.2  # 重力加速度
 
-    def __init__(self, pos, blocks, python):
+    def __init__(self, pos, blocks, player):
         pygame.sprite.Sprite.__init__(self, self.containers)
         self.left_image = load_image("enemy.png", -1)
         self.right_image = pygame.transform.flip(self.left_image, 1, 0)
@@ -32,7 +32,7 @@ class Enemy(pygame.sprite.Sprite):
         self.rect.x, self.rect.y = pos[0], pos[1]  # 座標設定
 
         self.blocks = blocks
-        self.python = python
+        self.player = player
         self.mode = self.LEFT
         self.fpx = float(self.rect.x)
         self.fpy = float(self.rect.y)
@@ -159,7 +159,7 @@ class Enemy(pygame.sprite.Sprite):
             return False
 
     def offset_start(self):
-        offsetx, offsety = self.python.calc_offset()
+        offsetx, offsety = self.player.calc_offset()
         screen_rect = Rect(
             offsetx, offsety, offsetx + SCR_RECT.width, offsety + SCR_RECT.height
         )
